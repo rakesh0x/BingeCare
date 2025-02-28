@@ -1,6 +1,7 @@
 import { Server } from 'socket.io'
 import { createServer } from 'http'
 import cors from 'cors';
+import { timeStamp } from 'console';
 
 const httpServer = createServer();
 const io = new Server(httpServer, {
@@ -81,21 +82,52 @@ io.on('connection', (socket) => {
             socket.emit("error", "You're not in the room");
             return;
         }
+
+        io.to(room).emit("roomMessage", {
+            rooms,
+            Message,
+            sender: users.get(socket.id),
+            timeStamp: new Date()
+        })
     })
 
-    socket.on('disconnect', () => {  
-        const user = users.get(socket.id)
 
-        if(user) {
-            users.delete(socket.id)
+    // Leave room Logic
 
-            socket.emit("userLeft", username)
-            
-            io.emit("users", Array.from(users.values()));
 
-            console.log(username, "Left the Chat")
+    socket.on("leaveRoom", (roomname) => {
+        if( rooms.has(roomname)) {
+            rooms.get(roomname).delete(socket.id)
+
+            if( rooms.get(roomname).size === 0 ) {
+                rooms.delete(roomname)
+                io.emit("roomList", Array.from(users.keys()));
+            } else {
+                socket.to(roomname).emit("userLeftRoom", {
+                    room: roomname,
+                    user: users.get(socket.id)
+                })
+            }
+            socket.leave(roomname)
         }
-    });
+    })
+
+
+    // Disconnect logic to remove membership from my application
+    
+    socket.on("Disconnect", () => {
+        const user = users.get(socket.id);
+
+        if( user ) {
+            rooms.forEach(( members, username ) => {
+                members.delete(socket.id);
+
+                if( members.size === 0 ) {
+                    members.delete(socket.id)
+                }
+            })          
+        }
+    })
 });
 
 httpServer.listen(8080, () => {
