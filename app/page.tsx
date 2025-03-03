@@ -1,9 +1,9 @@
 "use client"
 
-import { ChatBox } from "@/components/ChatwindowFrontend";
+import { Grid } from "../components/BackGround/Grid";
 
 export default function Home() {
   return (
-      <ChatBox/>
+      <Grid/>
   );
 }

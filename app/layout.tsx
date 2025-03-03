@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { DotPatternDemo } from "@/components/magicui/dotPattern";
+import { Navbar } from "../components/Landing/Navbar";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -27,8 +27,8 @@ export default function RootLayout({
     <html lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        <DotPatternDemo>{children}</DotPatternDemo> 
+      ><Navbar/>
+        {children}
       </body>
     </html>
   );
