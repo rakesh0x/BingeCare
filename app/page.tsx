@@ -1,9 +1,9 @@
-"use client"
+import { HomePage } from "@/components/Homepage/Homepage";
 
-import { Grid } from "../components/BackGround/Grid";
-
-export default function Home() {
+export default function App() {
   return (
-      <Grid/>
-  );
+    <div>
+      <HomePage/>
+    </div>
+  )
 }
