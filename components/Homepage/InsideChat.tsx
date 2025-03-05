@@ -2,8 +2,8 @@
 
 export const ChatRoom = () => {
     return (
-        <div className="text-gray-700">
-            This is My ChatRoom
+        <div className="flex justify-center">
+            Join or Create Room             
         </div>
     )
 }
