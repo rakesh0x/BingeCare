@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { Bricolage_Grotesque } from "next/font/google";
 import "./globals.css";
-import { Navbar } from "../components/Landing/Navbar";
-import { CardWithForm } from "@/components/Landing/Container";
+import { Grid } from "@/components/BackGround/Grid";
+import { Navbar } from "@/components/Landing/Navbar";
 
 const bricolage = Bricolage_Grotesque({ subsets: ["latin"], weight: "400" });
 
@@ -19,8 +19,13 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${bricolage.className} antialiased`}>
-        <Navbar />
-        {children}
+        <Navbar /> 
+        <div className="relative h-screen w-screen">
+          <Grid /> 
+          <div className="absolute inset-0 flex items-center justify-center">
+            {children}
+          </div>
+        </div>
       </body>
     </html>
   );

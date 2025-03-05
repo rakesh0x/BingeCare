@@ -1,7 +1,7 @@
 import Image from "next/image";
-import { CardWithForm } from "../Landing/Container" 
 
-export const Grid = ({ children }: { children: React.ReactNode }) => {
+
+export const Grid = () => {
   return (
     <div className="bg-black h-screen w-screen flex items-center justify-center relative overflow-hidden">
       <Image
@@ -11,9 +11,9 @@ export const Grid = ({ children }: { children: React.ReactNode }) => {
         objectFit="cover"
         quality={100}
       />
-      <div className="absolute flex justify-center items-center w-full h-full">
+      {/* <div className="absolute flex justify-center items-center w-full h-full">
         <CardWithForm>{children}</CardWithForm>
-      </div>
+      </div> */}
     </div>
   );
 };

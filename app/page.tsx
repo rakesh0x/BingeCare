@@ -1,9 +1,10 @@
-import { HomePage } from "@/components/Homepage/Homepage";
+import { Homepage } from "../components/Homepage/Homepage";
+import JoinRoom from "./join/page";
 
 export default function App() {
   return (
     <div>
-      <HomePage/>
+      <Homepage/>
     </div>
   )
 }
