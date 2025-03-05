@@ -1,10 +1,9 @@
-import { Homepage } from "../components/Homepage/Homepage";
-import JoinRoom from "./join/page";
+import { CardWithForm } from "@/components/Landing/Container";
 
 export default function App() {
   return (
-    <div>
-      <Homepage/>
-    </div>
+    <>
+      <CardWithForm/>
+    </>
   )
 }
