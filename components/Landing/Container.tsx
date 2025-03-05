@@ -30,7 +30,7 @@ export const CardWithForm = () => {
           whileTap={{ scale: 0.95, x: -5 }}
           whileHover={{ scale: 1.09, x: -5 }}
           transition={{ type: "spring", stiffness: 500, damping: 12 }}
-          className="rounded-full text-xl font-semibold bg-white text-black py-3 hover:bg-red-400 transition-colors hover:cursor-pointer shadow-md w-full"
+          className="rounded-full text-xl font-semibold bg-white text-black py-3 hover:bg-red-500 transition-colors hover:cursor-pointer shadow-md w-full"
           onClick={() => router.push("/join")} 
         >
           Join a Room
@@ -40,7 +40,8 @@ export const CardWithForm = () => {
           whileTap={{ scale: 0.95, x: -5 }}
           whileHover={{ scale: 1.09, x: -5 }}
           transition={{ type: "spring", stiffness: 500, damping: 12 }}
-          className="rounded-full text-xl font-semibold bg-white text-black py-3 hover:bg-red-400 transition-colors hover:cursor-pointer shadow-md w-full"
+          className="rounded-full text-xl font-semibold bg-white text-black py-3 hover:bg-red-500 transition-colors hover:cursor-pointer shadow-md w-full"
+          onClick={() => router.push("/create")}
         >
           Create a Room
         </motion.button>
