@@ -11,10 +11,36 @@ import { Send, Copy, LogOut } from "lucide-react";
 import { io } from "socket.io-client"
 import { useRouter } from "next/router";
 
-const socket = io("http://localhost:8080"); 
+interface types {
+  socketId: string
+}
 
+const socket = io("http://localhost:8080"); 
 export const ChatUI = () => {
   const router = useRouter();
+  const [ socketId, setsocketId ] = React.useState<string>("")
+  const [ isCopied, setisCopied ] = React.useState(false)
+  const [ newMessage, setnewMessage ] = React.useState("")
+
+  const CopyButtonComp = (textToCopy:any) => {
+    try{
+      const socketid = socket.id
+      if( socketid ) {
+        setsocketId(socketId)
+      }
+      navigator.clipboard.writeText(textToCopy)
+      setisCopied(true)
+      setTimeout(() => {
+        setisCopied(false)
+      }, 3000);
+    } catch(error){
+      console.error("error copying the roomId");
+    }
+
+  
+
+  }
+
   return (
     <Card className="w-[650px] h-[500px] bg-black shadow-lg rounded-xl p-4 flex flex-col relative text-white">
       <div className="flex justify-between items-center px-4 py-2 ">
@@ -22,15 +48,14 @@ export const ChatUI = () => {
           <LogOut size={16} className="inline-block mr-2"/>Leave
         </Button>
         <CardTitle className="text-lg font-bold">Room Name</CardTitle>
-        <Button className="bg-red-600 text-white px-4 py-1 rounded-lg text-sm font-semibold hover:cursor-pointer ">
+        <Button className="bg-red-600 text-white px-4 py-1 rounded-lg text-sm font-semibold hover:cursor-pointer "
+        onClick={CopyButtonComp}
+        >
           <Copy size={16} className="inline-block mr-2"
-
           /> Copy RoomID
         </Button>
       </div>
-
       <CardContent className="flex-1 overflow-auto p-4"></CardContent>
-
       <div className="flex items-center p-4">
         <input
           type="text"
