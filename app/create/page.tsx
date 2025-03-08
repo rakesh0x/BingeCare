@@ -1,4 +1,4 @@
-import { CreateRoom } from "@/components/CreateRoom/createRoom";
+import { CreateRoom } from "@/components/CreateRoom/createRoom";    
 
 const CreateRoomHandler = () => {
     return (

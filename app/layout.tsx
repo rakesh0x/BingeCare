@@ -21,7 +21,7 @@ export default function RootLayout({
       <body className={`${bricolage.className} antialiased`}>
         <Navbar /> 
         <div className="relative h-screen w-screen">
-          <Grid /> 
+          <Grid />
           <div className="absolute inset-0 flex items-center justify-center">
             {children}
           </div>
