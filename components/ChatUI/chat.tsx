@@ -9,7 +9,9 @@ import {
 import { Button } from "@/components/ui/button";
 import { Send, Copy, LogOut } from "lucide-react";
 import { io } from "socket.io-client"
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner"
+import { Toaster } from "../ui/sonner";
 
 interface types {
   socketId: string
@@ -30,6 +32,7 @@ export const ChatUI = () => {
       }
       navigator.clipboard.writeText(textToCopy)
       setisCopied(true)
+      toast("RoomId Copying Successful")
       setTimeout(() => {
         setisCopied(false)
       }, 3000);
@@ -45,6 +48,7 @@ export const ChatUI = () => {
 
   return (
     <Card className="w-[650px] h-[500px] bg-black shadow-lg rounded-xl p-4 flex flex-col relative text-white">
+    <Toaster/>
       <div className="flex justify-between items-center px-4 py-2 ">
         <Button className="bg-red-600 text-white px-4 py-1 rounded-lg text-sm font-semibold hover:cursor-pointer">
           <LogOut size={16} className="inline-block mr-2"/>Leave
