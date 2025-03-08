@@ -37,8 +37,10 @@ export const ChatUI = () => {
       console.error("error copying the roomId");
     }
 
-  
-
+    const MessageHandler = () => {
+      const socketId = socket.id
+      socket.emit("roomMessage", { message: newMessage, room: socketId })
+    }
   }
 
   return (
@@ -61,7 +63,7 @@ export const ChatUI = () => {
           type="text"
           placeholder="Type a message..."
           className="flex-1 h-[40px] rounded-full bg-gray-300 text-black px-4 text-sm outline-none"
-          onChange={(e) => }
+          onInput={(e) => setnewMessage(newMessage)}
         />
         <Button className="ml-2 bg-red-600 text-white rounded-full p-3 hover:cursor-pointer ">
           <Send size={20} />
