@@ -13,20 +13,35 @@ import { useRouter } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import { io } from "socket.io-client";
 
-const socket = io("http://localhost:8080");
+
 
 export const JoinRoom = () => {
   const router = useRouter();
   const [roomId, setRoomId] = React.useState("");
+  const socketRef = React.useRef<Socket | null>(null);
 
-  const handleJoinRoomEvent = () => {
-    if (roomId.trim()) {
-      socket.emit("join", { roomId });
-      router.push("/chat");
-    } else {
-      alert("Please enter a valid Room ID");
-    }
-  };
+
+  React.useEffect(() => {
+    socketRef.current = io("http://localhost:8080");
+    const socket = socketRef.current;
+
+    const CredSender = () => {
+      if( roomId ) {
+        socket.emit("join", { roomname: roomId})
+        console.log("sended roomId to socket", roomId)
+        router.push("/chat")
+  
+        socket.emit("userJoined", { room: roomId})
+        console.log("sended userJoined to socket", roomId)
+  
+        socket.emit("roomJoined")
+      }
+    }  
+
+  }, []) 
+
+
+  
 
   return (
     <Card className="w-[500px] h-[450px] bg-black shadow-lg rounded-4xl p-6 flex flex-col relative">
@@ -56,7 +71,7 @@ export const JoinRoom = () => {
             whileHover={{ scale: 1.09, x: -5 }}
             transition={{ type: "spring", stiffness: 500, damping: 12 }}
             className="w-[110px] h-[50px] rounded-4xl text-white bg-red-800 cursor-pointer font-semibold ml-80 mt-9"
-            onClick={handleJoinRoomEvent}
+            onClick={CredSender}
           >
             Join Room
           </motion.button>

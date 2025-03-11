@@ -21,15 +21,14 @@ export const CreateRoom = () => {
   const [roomname, setRoomName] = React.useState("");
   const [username, setUsername] = React.useState("");
 
-  const handleRoomEvent = () => {
-    if (username && roomname) {
-      // Send room creation request to the server
-      socket.emit("create", roomname);
 
-      // Listen for confirmation
-      socket.on("roomCreated", ({ roomname }) => {
-        console.log(`Room ${roomname} created successfully`);
-        router.push(`/chat?room=${roomname}`);
+  const handleRoomEvent = () => {
+    if (roomname && username) {
+      socket.emit("create", { roomname, username });
+
+      socket.on("roomCreated", (data) => {
+        console.log(`Room ${data.roomname} created successfully`);
+        router.push(`/chat?room=${data.roomname}`);
       });
     } else {
       alert("Please enter your username and roomname");
@@ -41,7 +40,7 @@ export const CreateRoom = () => {
       <CardHeader className="p-0 mb-4 mt-5 text-center w-full">
         <button
           className="rounded-xl w-[20px] h-[30] bg-black hover:cursor-pointer flex"
-          onClick={() => router.back()} // Navigate back on click
+          onClick={() => router.back()} 
         >
           <ArrowLeft size={16} />
         </button>

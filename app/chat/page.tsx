@@ -1,4 +1,4 @@
-"use client"
+
 
 import { ChatUI } from "@/components/ChatUI/chat";
 
