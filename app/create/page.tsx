@@ -1,9 +1,9 @@
-import { CreateRoom } from "@/components/CreateRoom/createRoom";    
+import { ChatUI } from "@/components/CreateRoom/createRoom";    
 
 const CreateRoomHandler = () => {
     return (
         <div>
-            <CreateRoom/>
+            <ChatUI/>
         </div>
     )
 }
