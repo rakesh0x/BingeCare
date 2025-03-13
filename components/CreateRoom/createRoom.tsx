@@ -11,44 +11,54 @@ import {
 } from "@/components/ui/card";
 import { useRouter } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
-import { io } from "socket.io-client";
+import { io, Socket } from "socket.io-client";
 
+
+interface RoomData {
+  roomname: string
+}
 
 export const CreateRoom = () => {
   const router = useRouter();
   const [roomname, setRoomName] = React.useState("");
-  const [ username, setUsername] = React.useState("");
-  const [socketId, setSocketId] = React.useState("");
-
-  const socket = io(process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:8080", {
-    username: username
-  })
-  
+  const [socketId, setSocketId] = React.useState<string>();
+  const [ socket, setSocket ] = React.useState<Socket | null>(null);
 
   React.useEffect(() => {
+    const socket = io("http://localhost:8080");
+    setSocket(socket);  
+
     socket.on("connect", () => {
-      setSocketId(socket.id ?? "")
+      setSocketId(socket.id);
       console.log("Connected to socket", socket.id);
     });
 
-    socket.on("roomCreated", ({ roomName, roomId }) => {
-      console.log(`Room '${roomName}' created successfully with ID: ${roomId}`);
-      router.push(`/chat?room=${roomName}`);
+    socket.on("roomCreated", ({roomname, socketId}) => {
+      console.log("Room created successfully with event", `${socketId} ${roomname}`);
+      router.push(`/chat/${roomname}`);
+    });
+
+    socket.on("join", (data: RoomData) => {
+      console.log("Join event received", data);
     });
 
     return () => {
       socket.off("roomCreated");
       socket.off("connect");
+      socket.off("join");
+      socket.disconnect();
     };
-  }, [router]);
+  }, []);
+
 
   const handleRoomEvent = () => {
-    if (roomname && username) {
+    if ( roomname.trim() && socket ) {
       console.log("Sending room creation request...");
-      socket.emit("create", { roomname, username }); 
+      socket.emit("create", { roomname }); 
     } else {
       alert("Please enter your username and room name");
     }
+
   };
 
   return (
@@ -71,11 +81,9 @@ export const CreateRoom = () => {
         <input
           type="text"
           placeholder="Enter Username"
-          onChange={(e) => setUsername(e.target.value)}
-          value={username}
           className="mt-3 w-[300px] h-[40px] rounded-full bg-gray-200 text-black px-4 text-lg outline-none focus:ring-2 focus:ring-gray-400"
         />
-
+        
         <div className="mt-8 text-xl text-white font-semibold">
           Enter Room Name
         </div>
