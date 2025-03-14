@@ -35,7 +35,7 @@ export const CreateRoom = () => {
 
     socket.on("roomCreated", ({roomname, socketId}) => {
       console.log("Room created successfully with event", `${socketId} ${roomname}`);
-      router.push(`/chat/${roomname}`);
+      router.push(`/chat?room=${roomname}`);
     });
 
     socket.on("join", (data: RoomData) => {

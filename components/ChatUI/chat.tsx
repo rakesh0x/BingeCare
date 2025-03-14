@@ -9,45 +9,39 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import { Toaster } from "../ui/sonner";
 
+
 export const ChatUI = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const room = searchParams.get("room") || ""; 
 
-  const [socketId, setSocketId] = React.useState<string>("");
   const [isCopied, setIsCopied] = React.useState(false);
-  const [messages, setMessages] = React.useState<Array<{ message: string; sender: string }>>([]);
-  const [newMessage, setNewMessage] = React.useState("");
-
+  const [messages, setMessages] = React.useState<Array<{message: string}>>([])
+  const [newMessage, setNewMessage] = React.useState<string>('');
   const socketRef = React.useRef<Socket | null>(null);
 
-
   React.useEffect(() => {
-    if (!room) {
-      toast("Room not found!");
-      router.push("/");
-      return
-    }
 
-    socket.emit("joinRoom", { room })
+    socketRef.current = io("http://localhost:8080");
+    const socket = socketRef.current;
 
-    socket.on("roomMessage", (room: { message: string; sender: string }) => {
-      setMessages((prev) => [...prev, room]);
+    socket.on("roomMessage", (room: { message: string}) => {
+      setMessages((prev) => [...prev, room])
     });
 
     return () => {
-      socket.disconnect()
-    }
-  }, [room, router, searchParams]);
+      socket.off('roomMessage');
+    };
+  }, [room]);
 
   const handleCopyRoomID = () => {
     if (!room) {
       toast("Room ID is not available");
       return;
     }
-    navigator.clipboard.writeText(room)
-    setIsCopied(true)
-    toast("Room ID Copied Successfully")
+    navigator.clipboard.writeText(room);
+    setIsCopied(true);
+    toast("Room ID Copied Successfully");
     setTimeout(() => setIsCopied(false), 3000);
   };
 
@@ -55,11 +49,9 @@ export const ChatUI = () => {
     if (newMessage.trim() && socketRef.current) {
       socketRef.current.emit("roomMessage", {
         message: newMessage,
-        room,
-        sender: "Guest"
-   
+        room
       });
-      setMessages((prev) => [...prev, { message: newMessage, sender:"Guest" }]);
+      setMessages((prev) => [...prev, { message: newMessage }]);
       setNewMessage("");
     } else {
       toast("Message cannot be empty");
@@ -107,10 +99,10 @@ export const ChatUI = () => {
               <div
                 key={index}
                 className={`mb-2 p-2 rounded-lg ${
-                  msg.sender === "Guest" ? "ml-auto bg-red-700 max-w-[80%]" : "mr-auto bg-gray-700 max-w-[80%]"
+                  msg ? "ml-auto bg-red-700 max-w-[80%]" : "mr-auto bg-gray-700 max-w-[80%]"
                 }`}
               >
-                <div className="text-xs font-bold mb-1">{msg.sender}</div>
+                <div className="text-xs font-bold mb-1">{msg.message}</div>
                 <div>{msg.message}</div>
               </div>
             ))
