@@ -20,7 +20,6 @@ interface RoomData {
 
 export const CreateRoom = () => {
   const router = useRouter();
-  const [roomname, setRoomName] = React.useState("");
   const [socketId, setsocketId] = React.useState<string>();
   const [ socket, setSocket ] = React.useState<Socket | null>(null);
 
@@ -35,8 +34,8 @@ export const CreateRoom = () => {
 
     socket.on("roomCreated", ({roomCode, socketId}) => {
       console.log("Room created successfully with event", `${socketId} ${roomCode}`);
-      router.push(`/chat?room=${roomCode}`);
-    });
+      router.push(`/chat?roomId=${roomCode}`)
+    })
 
     socket.on("join", (data: RoomData) => {
       console.log("Join event received", data);
@@ -90,8 +89,6 @@ export const CreateRoom = () => {
         <input
           type="text"
           placeholder="Enter Room Name"
-          onChange={(e) => setRoomName(e.target.value)} 
-          value={roomname}
           className="mt-5 w-[300px] h-[40px] rounded-full bg-gray-200 text-black px-4 text-lg outline-none focus:ring-2 focus:ring-gray-400"
         />
 

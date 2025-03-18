@@ -11,13 +11,12 @@ import { Toaster } from "../ui/sonner";
 
 export const ChatUI = () => {
   const router = useRouter();
-
   const [isCopied, setIsCopied] = React.useState(false);
   const [messages, setMessages] = React.useState<Array<{message: string}>>([])
   const [newMessage, setNewMessage] = React.useState<string>('');
   const socketRef = React.useRef<Socket | null>(null);
   const searchParams = useSearchParams();
-  const roomCode = searchParams.get("roomCode");
+  const roomCode = searchParams.get("room");
 
   React.useEffect(() => {
     socketRef.current = io("http://localhost:8080");
