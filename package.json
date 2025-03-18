@@ -22,6 +22,7 @@
     "lucide-react": "^0.476.0",
     "next": "15.2.0",
     "next-themes": "^0.4.4",
+    "randombytes": "^2.1.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "socket.io": "^4.8.1",

@@ -9,19 +9,17 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import { Toaster } from "../ui/sonner";
 
-
 export const ChatUI = () => {
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const room = searchParams.get("room") || ""; 
 
   const [isCopied, setIsCopied] = React.useState(false);
   const [messages, setMessages] = React.useState<Array<{message: string}>>([])
   const [newMessage, setNewMessage] = React.useState<string>('');
   const socketRef = React.useRef<Socket | null>(null);
+  const searchParams = useSearchParams();
+  const roomCode = searchParams.get("roomCode");
 
   React.useEffect(() => {
-
     socketRef.current = io("http://localhost:8080");
     const socket = socketRef.current;
 
@@ -32,14 +30,14 @@ export const ChatUI = () => {
     return () => {
       socket.off('roomMessage');
     };
-  }, [room]);
+  }, [router]);
 
   const handleCopyRoomID = () => {
-    if (!room) {
+    if (!roomCode) {
       toast("Room ID is not available");
       return;
     }
-    navigator.clipboard.writeText(room);
+    navigator.clipboard.writeText(roomCode);
     setIsCopied(true);
     toast("Room ID Copied Successfully");
     setTimeout(() => setIsCopied(false), 3000);
@@ -49,10 +47,10 @@ export const ChatUI = () => {
     if (newMessage.trim() && socketRef.current) {
       socketRef.current.emit("roomMessage", {
         message: newMessage,
-        room
+        roomCode
       });
       setMessages((prev) => [...prev, { message: newMessage }]);
-      setNewMessage("");
+      setNewMessage("")
     } else {
       toast("Message cannot be empty");
     }
@@ -65,7 +63,7 @@ export const ChatUI = () => {
   };
 
   const LeaveHandler = () => {
-    router.push("/");
+    router.push("/")
   };
 
   return (
@@ -80,7 +78,7 @@ export const ChatUI = () => {
             <LogOut size={16} className="inline-block mr-2" />
             Leave
           </Button>
-          <CardTitle className="text-lg font-bold">{room || "Chat Room"}</CardTitle>
+          <CardTitle className="text-lg font-bold">{roomCode}</CardTitle>
           <Button
             className="bg-red-600 text-white px-4 py-1 rounded-lg text-sm font-semibold hover:cursor-pointer"
             onClick={handleCopyRoomID}

@@ -18,10 +18,15 @@ export const JoinRoom = () => {
   const router = useRouter();
   const [roomId, setRoomId] = React.useState("");
   const socketRef = React.useRef<Socket | null>(null);
+  const [ roomname, setRoomName ] = React.useState('')
 
   React.useEffect(() => {
     socketRef.current = io("http://localhost:8080");
     const socket = socketRef.current;
+
+    socket.on("join", ( roomname ) => {
+      console.log("Joined the room with roomname", roomname)
+    })
 
     return () => {
       if (socket) {
@@ -33,9 +38,6 @@ export const JoinRoom = () => {
   const handleJoinRoom = () => {
     if (roomId && socketRef.current) {
       const socket = socketRef.current;
-      
-      socket.emit("join", { roomname: roomId });
-      console.log("Sent roomId to socket", roomId);
       
       socket.emit("userJoined", { room: roomId });
       console.log("Sent userJoined to socket", roomId);
@@ -66,6 +68,15 @@ export const JoinRoom = () => {
             type="text"
             value={roomId}
             onChange={(e) => setRoomId(e.target.value)}
+            className="mt-12 w-[300px] h-[50px] rounded-full bg-gray-200 text-black px-4 text-lg outline-none focus:ring-2 focus:ring-gray-400"
+            placeholder="Roomname to Join"
+          />
+          <br/>
+          <br/>
+          <input
+            type="text"
+            value={roomname}
+            onChange={(e) => setRoomName(e.target.value)}
             className="mt-12 w-[300px] h-[50px] rounded-full bg-gray-200 text-black px-4 text-lg outline-none focus:ring-2 focus:ring-gray-400"
             placeholder="Room ID"
           />
