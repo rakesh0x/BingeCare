@@ -9,14 +9,21 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import { Toaster } from "../ui/sonner";
 
+
+interface roomtypes {
+  roomname: string
+}
+
 export const ChatUI = () => {
   const router = useRouter();
   const [isCopied, setIsCopied] = React.useState(false);
   const [messages, setMessages] = React.useState<Array<{message: string}>>([])
   const [newMessage, setNewMessage] = React.useState<string>('');
+  const [roomname, setRoomname] = React.useState<string>('');
   const socketRef = React.useRef<Socket | null>(null);
   const searchParams = useSearchParams();
-  const roomCode = searchParams.get("room");
+  const roomCode = searchParams.get("room");  
+
 
   React.useEffect(() => {
     socketRef.current = io("http://localhost:8080");
@@ -31,12 +38,22 @@ export const ChatUI = () => {
     };
   }, [router]);
 
+  React.useEffect(() => {
+    socketRef.current = io("http://localhost:8080");
+    const socket = socketRef.current;
+
+      socket.on("roomCreated", (data: { roomname: string }) => {
+        setRoomname(data.roomname);
+        console.log("got the roomname from the server", data.roomname);
+      })
+  },[socketRef.current])
+
   const handleCopyRoomID = () => {
     if (!roomCode) {
       toast("Room ID is not available");
       return;
     }
-    navigator.clipboard.writeText(roomCode);
+    navigator.clipboard.writeText(roomCode)
     setIsCopied(true);
     toast("Room ID Copied Successfully");
     setTimeout(() => setIsCopied(false), 3000);
@@ -77,7 +94,7 @@ export const ChatUI = () => {
             <LogOut size={16} className="inline-block mr-2" />
             Leave
           </Button>
-          <CardTitle className="text-lg font-bold">{roomCode}</CardTitle>
+          <CardTitle className="text-lg font-bold">{roomname}</CardTitle>
           <Button
             className="bg-red-600 text-white px-4 py-1 rounded-lg text-sm font-semibold hover:cursor-pointer"
             onClick={handleCopyRoomID}

@@ -13,7 +13,6 @@ import { useRouter } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import { io, Socket } from "socket.io-client";
 
-
 interface RoomData {
   roomname: string
 }
@@ -22,6 +21,7 @@ export const CreateRoom = () => {
   const router = useRouter();
   const [socketId, setsocketId] = React.useState<string>();
   const [ socket, setSocket ] = React.useState<Socket | null>(null);
+  const [ roomname, setRoomName ] = React.useState("")
 
   React.useEffect(() => {
     const socket = io("http://localhost:8080");
@@ -32,10 +32,10 @@ export const CreateRoom = () => {
       console.log("Connected to socket", socket.id);
     });
 
-    socket.on("roomCreated", ({roomCode, socketId}) => {
-      console.log("Room created successfully with event", `${socketId} ${roomCode}`);
-      router.push(`/chat?roomId=${roomCode}`)
-    })
+    socket.on("roomCreated", ({roomCode, socketId, roomname}) => {
+      console.log("Room created successfully with event", `${socketId} ${roomCode} ${roomname}`);
+      router.push(`/chat?room=${roomCode}`)
+    });
 
     socket.on("join", (data: RoomData) => {
       console.log("Join event received", data);
@@ -49,15 +49,13 @@ export const CreateRoom = () => {
     };
   }, []);
 
-
   const handleRoomEvent = () => {
     if ( socket ) {
       console.log("Sending room creation request...");
-      socket.emit("create", {}); 
+      socket.emit("create")
     } else {
       alert("Please enter your username and room name");
     }
-
   };
 
   return (
@@ -90,6 +88,8 @@ export const CreateRoom = () => {
           type="text"
           placeholder="Enter Room Name"
           className="mt-5 w-[300px] h-[40px] rounded-full bg-gray-200 text-black px-4 text-lg outline-none focus:ring-2 focus:ring-gray-400"
+          value={roomname}
+          onChange={(e) => setRoomName(e.target.value)}
         />
 
         <motion.button

@@ -24,8 +24,8 @@ export const JoinRoom = () => {
     socketRef.current = io("http://localhost:8080");
     const socket = socketRef.current;
 
-    socket.on("join", ( roomname ) => {
-      console.log("Joined the room with roomname", roomname)
+    socket.on("joined-room", ( data ) => {
+      console.log("Joined the room with roomname", data)
     })
 
     return () => {
@@ -39,12 +39,9 @@ export const JoinRoom = () => {
     if (roomId && socketRef.current) {
       const socket = socketRef.current;
       
-      socket.emit("userJoined", { room: roomId });
-      console.log("Sent userJoined to socket", roomId);
-      
-      socket.emit("roomJoined");  
-      
-      router.push("/chat");
+      socket.emit("join", { data: { roomId } });
+      console.log("Sent join request to socket", roomId);
+      router.push(`/chat?room=${roomId}`);
     }
   };
 
@@ -66,8 +63,8 @@ export const JoinRoom = () => {
         <CardContent className="p-0">
           <input
             type="text"
-            value={roomId}
-            onChange={(e) => setRoomId(e.target.value)}
+            value={roomname}
+            onChange={(e) => setRoomName(e.target.value)}
             className="mt-12 w-[300px] h-[50px] rounded-full bg-gray-200 text-black px-4 text-lg outline-none focus:ring-2 focus:ring-gray-400"
             placeholder="Roomname to Join"
           />
@@ -75,8 +72,8 @@ export const JoinRoom = () => {
           <br/>
           <input
             type="text"
-            value={roomname}
-            onChange={(e) => setRoomName(e.target.value)}
+            value={roomId}
+            onChange={(e) => setRoomId(e.target.value)}
             className="mt-12 w-[300px] h-[50px] rounded-full bg-gray-200 text-black px-4 text-lg outline-none focus:ring-2 focus:ring-gray-400"
             placeholder="Room ID"
           />
