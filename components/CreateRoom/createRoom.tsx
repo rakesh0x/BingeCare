@@ -13,49 +13,28 @@ import { useRouter } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import { io, Socket } from "socket.io-client";
 
-interface RoomData {
-  roomname: string
-}
+const socket = io("http://localhost:8080", { autoConnect: false });
 
 export const CreateRoom = () => {
   const router = useRouter();
-  const [socketId, setsocketId] = React.useState<string>();
-  const [ socket, setSocket ] = React.useState<Socket | null>(null);
-  const [ roomname, setRoomName ] = React.useState("")
+  const [roomname, setRoomName] = React.useState("");
 
   React.useEffect(() => {
-    const socket = io("http://localhost:8080");
-    setSocket(socket);  
+    if (!socket.connected) socket.connect(); // Connect only if not already connected
 
-    socket.on("connect", () => {
-      setsocketId(socket.id);
-      console.log("Connected to socket", socket.id);
-    });
-
-    socket.on("roomCreated", ({roomCode, socketId, roomname}) => {
-      console.log("Room created successfully with event", `${socketId} ${roomCode} ${roomname}`);
-      router.push(`/chat?room=${roomCode}`)
-    });
-
-    socket.on("join", (data: RoomData) => {
-      console.log("Join event received", data);
+    socket.on("roomCreated", ({ roomCode, socketId, roomname }) => {
+      console.log("Room created:", `${socketId} ${roomCode} ${roomname}`);
+      router.push(`/chat?room=${roomCode}`);
     });
 
     return () => {
-      socket.off("roomCreated");
-      socket.off("connect");
-      socket.off("join");
-      socket.disconnect();
+      socket.off("roomCreated"); 
     };
   }, []);
 
   const handleRoomEvent = () => {
-    if ( socket ) {
-      console.log("Sending room creation request...");
-      socket.emit("create")
-    } else {
-      alert("Please enter your username and room name");
-    }
+    console.log("Sending room creation request...");
+    socket.emit("create");
   };
 
   return (
@@ -63,7 +42,7 @@ export const CreateRoom = () => {
       <CardHeader className="p-0 mb-4 mt-5 text-center w-full">
         <button
           className="rounded-xl w-[20px] h-[30px] bg-black hover:cursor-pointer flex items-center"
-          onClick={() => router.back()} 
+          onClick={() => router.back()}
         >
           <ArrowLeft size={16} />
         </button>
@@ -80,7 +59,7 @@ export const CreateRoom = () => {
           placeholder="Enter Username"
           className="mt-3 w-[300px] h-[40px] rounded-full bg-gray-200 text-black px-4 text-lg outline-none focus:ring-2 focus:ring-gray-400"
         />
-        
+
         <div className="mt-8 text-xl text-white font-semibold">
           Enter Room Name
         </div>

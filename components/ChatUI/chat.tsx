@@ -9,64 +9,55 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import { Toaster } from "../ui/sonner";
 
-
-interface roomtypes {
-  roomname: string
-}
+// 🔥 Global Socket Instance (Singleton)
+const socket = io("http://localhost:8080", { autoConnect: false });
 
 export const ChatUI = () => {
   const router = useRouter();
   const [isCopied, setIsCopied] = React.useState(false);
-  const [messages, setMessages] = React.useState<Array<{message: string}>>([])
-  const [newMessage, setNewMessage] = React.useState<string>('');
-  const [roomname, setRoomname] = React.useState<string>('');
-  const socketRef = React.useRef<Socket | null>(null);
+  const [messages, setMessages] = React.useState<Array<{ message: string }>>([]);
+  const [newMessage, setNewMessage] = React.useState<string>("");
+  const [roomname, setRoomname] = React.useState<string>("");
   const searchParams = useSearchParams();
-  const roomCode = searchParams.get("room");  
-
+  const roomCode = searchParams.get("room");
 
   React.useEffect(() => {
-    socketRef.current = io("http://localhost:8080");
-    const socket = socketRef.current;
+    if (!socket.connected) socket.connect(); 
 
-    socket.on("roomMessage", (room: { message: string}) => {
-      setMessages((prev) => [...prev, room])
+    socket.on("roomMessage", (room: { message: string }) => {
+      setMessages((prev) => [...prev, room]);
+    });
+
+    socket.on("roomCreated", (data: { roomname: string }) => {
+      setRoomname(data.roomname);
+      console.log("Room name received:", data.roomname);
     });
 
     return () => {
-      socket.off('roomMessage');
+      socket.off("roomMessage");
+      socket.off("roomCreated");
     };
-  }, [router]);
-
-  React.useEffect(() => {
-    socketRef.current = io("http://localhost:8080");
-    const socket = socketRef.current;
-
-      socket.on("roomCreated", (data: { roomname: string }) => {
-        setRoomname(data.roomname);
-        console.log("got the roomname from the server", data.roomname);
-      })
-  },[socketRef.current])
+  }, []);
 
   const handleCopyRoomID = () => {
     if (!roomCode) {
       toast("Room ID is not available");
       return;
     }
-    navigator.clipboard.writeText(roomCode)
+    navigator.clipboard.writeText(roomCode);
     setIsCopied(true);
     toast("Room ID Copied Successfully");
     setTimeout(() => setIsCopied(false), 3000);
   };
 
   const handleMessageSend = () => {
-    if (newMessage.trim() && socketRef.current) {
-      socketRef.current.emit("roomMessage", {
+    if (newMessage.trim()) {
+      socket.emit("roomMessage", {
         message: newMessage,
-        roomCode
+        roomCode,
       });
       setMessages((prev) => [...prev, { message: newMessage }]);
-      setNewMessage("")
+      setNewMessage("");
     } else {
       toast("Message cannot be empty");
     }
@@ -79,7 +70,7 @@ export const ChatUI = () => {
   };
 
   const LeaveHandler = () => {
-    router.push("/")
+    router.push("/");
   };
 
   return (
@@ -112,9 +103,7 @@ export const ChatUI = () => {
             messages.map((msg, index) => (
               <div
                 key={index}
-                className={`mb-2 p-2 rounded-lg ${
-                  msg ? "ml-auto bg-red-700 max-w-[80%]" : "mr-auto bg-gray-700 max-w-[80%]"
-                }`}
+                className="mb-2 p-2 rounded-lg bg-red-700 max-w-[80%] ml-auto"
               >
                 <div className="text-xs font-bold mb-1">{msg.message}</div>
                 <div>{msg.message}</div>
@@ -131,7 +120,10 @@ export const ChatUI = () => {
             onChange={(e) => setNewMessage(e.target.value)}
             onKeyPress={handleKeyPress}
           />
-          <Button className="ml-2 bg-red-600 text-white rounded-full p-3 hover:cursor-pointer" onClick={handleMessageSend}>
+          <Button
+            className="ml-2 bg-red-600 text-white rounded-full p-3 hover:cursor-pointer"
+            onClick={handleMessageSend}
+          >
             <Send size={20} />
           </Button>
         </div>

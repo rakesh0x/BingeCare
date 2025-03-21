@@ -24,16 +24,32 @@ export const JoinRoom = () => {
     socketRef.current = io("http://localhost:8080");
     const socket = socketRef.current;
 
-    socket.on("joined-room", ( data ) => {
-      console.log("Joined the room with roomname", data)
-    })
+    // Connect event handler
+    socket.on("connect", () => {
+      if (roomId) {
+        socket.emit("join", { data: JSON.stringify({ roomId }) });
+      }
+    });
+
+    socket.on("joined-room", (data) => {
+      console.log("Joined the room with roomname", data);
+      // Handle successful join here
+    });
+
+    socket.on("error", (error) => {
+      console.error("Socket error:", error);
+      // Handle error here
+    });
 
     return () => {
       if (socket) {
+        socket.off("connect");
+        socket.off("joined-room");
+        socket.off("error");
         socket.disconnect();
       }
     };
-  }, []);
+  }, [roomId]);
 
   const handleJoinRoom = () => {
     if (roomId && socketRef.current) {
